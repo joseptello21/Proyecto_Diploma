@@ -14,8 +14,8 @@ export class TelemetryController {
 
       return res.status(200).json({
         success: true,
-        datos,
-        energias,
+        data: energias,
+        telemetrias: energias,
       });
     } catch (error) {
       console.error("Error fetching telemetry data:", error);

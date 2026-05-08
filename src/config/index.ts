@@ -36,6 +36,7 @@ export class App {
   private routes(): void {
     // Las rutas se configurarán más adelante
     this.routers.authRoutes.routes(this.app)
+    this.routers.telemetryRoutes.routes(this.app)
 
     this.app.use(authMiddleware)
 
@@ -46,7 +47,6 @@ export class App {
     this.routers.bateriaRoutes.routes(this.app)
     this.routers.estadoBateriaRoutes.routes(this.app)
     this.routers.estadoLuminariaRoutes.routes(this.app)
-    this.routers.telemetryRoutes.routes(this.app)
     this.routers.lecturaRoutes.routes(this.app)
     this.routers.luminarRoutes.routes(this.app)
     this.routers.sensorRoutes.routes(this.app)
