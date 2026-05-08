@@ -10,6 +10,7 @@ import { AlertaRoutes } from "./alerta";
 import { ComandoRoutes } from "./comando_remoto";
 import { EstadoLuminariaRoutes } from "./estado_luminaria";
 import { EstadoBateriaRoutes } from "./estado_bateria";
+import { TelemetryRoutes } from "./telemetry";
 import { LecturaRoutes } from "./lectura_sensor";
 import { DeviceRoutes } from "./devices.routers";
 
@@ -31,6 +32,7 @@ export class Routes {
   public comandoRoutes = new ComandoRoutes();
   public estadoLuminariaRoutes = new EstadoLuminariaRoutes();
   public estadoBateriaRoutes = new EstadoBateriaRoutes();
+  public telemetryRoutes = new TelemetryRoutes();
   public lecturaRoutes = new LecturaRoutes();
   public dispositivosRoutes = new DeviceRoutes();
   

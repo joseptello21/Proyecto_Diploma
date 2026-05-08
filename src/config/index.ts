@@ -46,6 +46,7 @@ export class App {
     this.routers.bateriaRoutes.routes(this.app)
     this.routers.estadoBateriaRoutes.routes(this.app)
     this.routers.estadoLuminariaRoutes.routes(this.app)
+    this.routers.telemetryRoutes.routes(this.app)
     this.routers.lecturaRoutes.routes(this.app)
     this.routers.luminarRoutes.routes(this.app)
     this.routers.sensorRoutes.routes(this.app)
