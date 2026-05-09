@@ -12,19 +12,99 @@ import { Sensor } from "../models/sensor";
 export class TelemetryController {
   public async getAll(req: Request, res: Response) {
     try {
+      console.log("🔍 [TELEMETRY] Iniciando getAll()");
       const telemetrias = await Telemetria.findAll({ order: [["fecha_registro", "DESC"]], limit: 50 });
+      console.log("📦 [TELEMETRY] Registros encontrados:", telemetrias.length);
+      
       const normalizedTelemetrias = telemetrias.map((telemetria: any) => this.normalizeTelemetry(telemetria));
+      console.log("✅ [TELEMETRY] Normalización completada");
 
       return res.status(200).json({
         success: true,
         data: normalizedTelemetrias,
         telemetrias: normalizedTelemetrias,
       });
-    } catch (error) {
-      console.error("Error fetching telemetry data:", error);
-      return res.status(500).json({ success: false, message: "Error interno al obtener telemetría" });
+    } catch (error: any) {
+      console.error("❌ [TELEMETRY] Error en getAll():", error.message, error.stack);
+      return res.status(500).json({ 
+        success: false, 
+        message: "Error interno al obtener telemetría",
+        error: error.message 
+      });
     }
   }
+
+  public async debug(req: Request, res: Response) {
+    try {
+      console.log("🔍 [DEBUG] Verificando conexión y tablas...");
+      const [rows]: any = await (Telemetria.sequelize as any).query("SHOW TABLES");
+      const tables = rows.map((r: any) => Object.values(r)[0]);
+      console.log("📋 Tablas encontradas:", tables);
+
+      const telemetriaCount = await Telemetria.count();
+      console.log("📦 Registros en telemetria:", telemetriaCount);
+
+      // Intentar obtener un registro para ver la estructura
+      const sample = await Telemetria.findOne();
+      console.log("📄 Muestra de registro:", sample);
+
+      return res.status(200).json({
+        success: true,
+        tables,
+        telemetriaCount,
+        sample,
+        message: "Debug info"
+      });
+    } catch (error: any) {
+      console.error("❌ [DEBUG] Error:", error.message, error.stack);
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  public async mockData(req: Request, res: Response) {
+    try {
+      console.log("🎭 [MOCK] Generando datos de prueba...");
+      const mockTelemetria = [
+        {
+          id: 1,
+          timestamp: new Date().toISOString(),
+          ldr: 450,
+          batteryVoltage: 12.3,
+          lamp: true,
+          autoMode: true,
+          manualStatus: false,
+          panelId: 1,
+          batteryId: 1,
+          luminariaId: 1,
+          energiaGenerada: 150.5
+        },
+        {
+          id: 2,
+          timestamp: new Date(Date.now() - 60000).toISOString(),
+          ldr: 500,
+          batteryVoltage: 12.5,
+          lamp: false,
+          autoMode: true,
+          manualStatus: false,
+          panelId: 1,
+          batteryId: 1,
+          luminariaId: 1,
+          energiaGenerada: 155.0
+        }
+      ];
+      return res.status(200).json({
+        success: true,
+        data: mockTelemetria,
+        telemetrias: mockTelemetria,
+        message: "Mock data - para pruebas"
+      });
+    } catch (error: any) {
+      console.error("❌ [MOCK] Error:", error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+
 
   private normalizeTelemetry(telemetria: any) {
     if (!telemetria) {

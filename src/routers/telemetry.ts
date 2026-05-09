@@ -9,6 +9,8 @@ export class TelemetryRoutes {
 
         app.route("/api/solar/telemetry").post(this.telemetryController.create);
         app.route("/api/solar/telemetry").get(this.telemetryController.getAll);
+        app.route("/api/solar/telemetry/debug").get(this.telemetryController.debug);
+        app.route("/api/solar/telemetry/mock").get(this.telemetryController.mockData);
 
     }
 
