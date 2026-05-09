@@ -139,8 +139,9 @@ export class TelemetryController {
       }
 
       let telemetryRecord = null;
+      const shouldCreateTelemetry = payloadPanelId || payloadBatteryId || payloadLuminariaId;
 
-      if (payloadPanelId && payloadBatteryId && payloadLuminariaId) {
+      if (shouldCreateTelemetry) {
         telemetryRecord = await Telemetria.create({
           ldr_value: payloadLdr,
           battery_voltage: payloadBatteryVoltage,

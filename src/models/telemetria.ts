@@ -58,15 +58,15 @@ Telemetria.init(
     },
     id_panel: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     id_bateria: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     id_luminaria: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     energia_generada: {
       type: DataTypes.FLOAT,
