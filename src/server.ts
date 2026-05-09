@@ -1,7 +1,7 @@
 import { App } from "./config/index";
 
 async function main() {
-  const app = new App(process.env.PORT || 21674);
+  const app = new App();
   await app.listen();
 }
 

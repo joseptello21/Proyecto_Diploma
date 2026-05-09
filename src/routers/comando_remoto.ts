@@ -1,5 +1,6 @@
 import { Request, Response, Application } from "express";
 import { ComandoController } from "../controllers/comando_remoto.controller";
+import { requireOperator } from "../middleware/roleMiddleware";
 
 export class ComandoRoutes {
 
@@ -13,7 +14,8 @@ export class ComandoRoutes {
         app.route("/comando").post(this.comandoController.getComandos);
 
         // Nuevo endpoint para enviar comandos a dispositivos ESP32
-        app.route("/api/device/command").post(this.comandoController.sendDeviceCommand);
+        // Solo operadores pueden enviar comandos de control
+        app.route("/api/device/command").post(requireOperator, this.comandoController.sendDeviceCommand);
 
     }
 }

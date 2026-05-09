@@ -4,6 +4,7 @@ import morgan from "morgan"
 import { sequelize, testConnection, getDatabaseInfo, renameTableIfNeeded } from "../database/db"
 import { Routes } from "../routers/index";
 import { authMiddleware } from "../middleware/authMiddleware"
+import { RoleInitializer } from "../utils/roleInitializer";
 var cors = require("cors")
 
 dotenv.config();
@@ -22,7 +23,7 @@ export class App {
   }
 
   private settings(): void {
-    this.app.set("port", this.port || process.env.PORT || 12437);
+    this.app.set("port", this.port || process.env.PORT || 3001);
   }
 
   private middlewares(): void {
@@ -77,6 +78,9 @@ export class App {
       // Sincronizar la base de datos
       await sequelize.sync({ force: false });
       console.log(`📦 Base de datos sincronizada exitosamente`);
+
+      // Inicializar roles base
+      await RoleInitializer.crearRolesBase();
     } catch (error) {
       console.error("❌ Error al conectar con la base de datos:", error);
       process.exit(1); // Terminar la aplicación si no se puede conectar
