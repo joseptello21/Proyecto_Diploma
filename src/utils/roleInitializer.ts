@@ -5,32 +5,26 @@ export class RoleInitializer {
     try {
       const rolesBase = [
         {
-          nombre: 'Operador',
-          descripcion: 'Rol para operar y controlar los dispositivos. Acceso a control manual de lámparas, cambio de modo automático/manual, y envío de comandos.',
-          estado: 'ACTIVO'
+          nombre_rol: 'Operador'
         },
         {
-          nombre: 'Monitor',
-          descripcion: 'Rol para monitorear datos en tiempo real. Solo visualización de telemetría, datos de sensores, batería y luminarias. Sin permisos de control.',
-          estado: 'ACTIVO'
+          nombre_rol: 'Monitor'
         },
         {
-          nombre: 'Admin',
-          descripcion: 'Rol de administrador con acceso total al sistema.',
-          estado: 'ACTIVO'
+          nombre_rol: 'Admin'
         }
       ];
 
       for (const rol of rolesBase) {
         const [rolExistente, creado] = await Rol.findOrCreate({
-          where: { nombre: rol.nombre },
+          where: { nombre_rol: rol.nombre_rol },
           defaults: rol
         });
 
         if (creado) {
-          console.log(`✅ Rol "${rol.nombre}" creado exitosamente`);
+          console.log(`✅ Rol "${rol.nombre_rol}" creado exitosamente`);
         } else {
-          console.log(`ℹ️ Rol "${rol.nombre}" ya existe`);
+          console.log(`ℹ️ Rol "${rol.nombre_rol}" ya existe`);
         }
       }
     } catch (error) {
