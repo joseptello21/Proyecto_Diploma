@@ -6,6 +6,8 @@ import { TelemetriaEnergia } from "../models/energia";
 import { Telemetria } from "../models/telemetria";
 import { EstadoBateria } from "../models/estado_bateria";
 import { EstadoLuminaria } from "../models/estado_luminaria";
+import { Device } from "../models/Device";
+import { Sensor } from "../models/sensor";
 
 export class TelemetryController {
   public async getAll(req: Request, res: Response) {
@@ -100,8 +102,31 @@ export class TelemetryController {
         sensorData,
         batteryUpdated: null,
         luminariaUpdated: null,
+        deviceUpdated: null,
+        sensorUpdated: null,
         energiaCreated: null,
       };
+
+      if (payloadPanelId) {
+        const device = await Device.findByPk(payloadPanelId);
+        if (device) {
+          const updatedDevice = await device.update({
+            status: payloadLamp ? "activo" : "inactivo",
+            mode: payloadAutoMode ? "automatico" : "manual",
+          });
+          response.deviceUpdated = updatedDevice;
+        }
+      }
+
+      if (payloadPanelId) {
+        // Buscar sensor asociado al dispositivo y actualizar datos
+        const sensor = await Sensor.findOne({ where: { id_dispositivo: payloadPanelId } });
+        if (sensor) {
+          // Los datos del sensor ya se crean en Datos, pero podemos actualizar el sensor si es necesario
+          // Por ahora, solo registramos que se encontró
+          response.sensorUpdated = sensor;
+        }
+      }
 
       if (payloadBatteryId) {
         const bateria = await Bateria.findByPk(payloadBatteryId);
