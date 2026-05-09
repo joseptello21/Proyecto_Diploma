@@ -203,59 +203,90 @@ export class TelemetryController {
       };
 
       if (payloadPanelId) {
-        const device = await Device.findByPk(payloadPanelId);
-        if (device) {
+        let device = await Device.findByPk(payloadPanelId);
+        if (!device) {
+          device = await Device.create({
+            id: payloadPanelId,
+            name: `Dispositivo IoT ${payloadPanelId}`,
+            location: 'Desconocido',
+            status: payloadLamp ? 'activo' : 'inactivo',
+            mode: payloadAutoMode ? 'automatico' : 'manual',
+          } as any);
+          response.deviceCreated = device;
+        } else {
           const updatedDevice = await device.update({
-            status: payloadLamp ? "activo" : "inactivo",
-            mode: payloadAutoMode ? "automatico" : "manual",
+            status: payloadLamp ? 'activo' : 'inactivo',
+            mode: payloadAutoMode ? 'automatico' : 'manual',
           });
           response.deviceUpdated = updatedDevice;
         }
       }
 
       if (payloadPanelId) {
-        // Buscar sensor asociado al dispositivo y actualizar datos
         const sensor = await Sensor.findOne({ where: { id_dispositivo: payloadPanelId } });
         if (sensor) {
-          // Los datos del sensor ya se crean en Datos, pero podemos actualizar el sensor si es necesario
-          // Por ahora, solo registramos que se encontró
           response.sensorUpdated = sensor;
+        } else {
+          const createdSensor = await Sensor.create({
+            tipo_sensor: 'Fotoresistor',
+            descripcion: `Sensor de luminosidad del dispositivo ${payloadPanelId}`,
+            id_dispositivo: payloadPanelId,
+            unidad_medida: 'lux',
+          });
+          response.sensorCreated = createdSensor;
         }
       }
 
       if (payloadBatteryId) {
-        const bateria = await Bateria.findByPk(payloadBatteryId);
-        if (bateria) {
+        let bateria = await Bateria.findByPk(payloadBatteryId);
+        if (!bateria) {
+          bateria = await Bateria.create({
+            id_bateria: payloadBatteryId,
+            capacidad_ah: 0,
+            voltaje: payloadBatteryVoltage ?? 0,
+            estado: payloadLamp ? 'activo' : 'inactivo',
+            id_panel: payloadPanelId ?? null,
+          } as any);
+          response.batteryCreated = bateria;
+        } else {
           const updatedBateria = await bateria.update({
             voltaje: payloadBatteryVoltage ?? bateria.voltaje,
-            estado: payloadLamp ? "activo" : "inactivo",
-          });
-
-          await EstadoBateria.create({
-            id_bateria: payloadBatteryId,
-            nivel_carga: payloadBatteryVoltage ?? 0,
-            fecha_estado: new Date(),
+            estado: payloadLamp ? 'activo' : 'inactivo',
           });
 
           response.batteryUpdated = updatedBateria;
         }
+
+        await EstadoBateria.create({
+          id_bateria: payloadBatteryId,
+          nivel_carga: payloadBatteryVoltage ?? 0,
+          fecha_estado: new Date(),
+        });
       }
 
       if (payloadLuminariaId) {
-        const luminaria = await Luminaria.findByPk(payloadLuminariaId);
-        if (luminaria) {
-          const updatedLuminaria = await luminaria.update({
-            estado: payloadLamp ? "activo" : "inactivo",
-          });
-
-          await EstadoLuminaria.create({
+        let luminaria = await Luminaria.findByPk(payloadLuminariaId);
+        if (!luminaria) {
+          luminaria = await Luminaria.create({
             id_luminaria: payloadLuminariaId,
-            estado: payloadLamp ? "activo" : "inactivo",
-            fecha_estado: new Date(),
+            tipo_luminaria: 'Luminaria IoT',
+            potencia_watts: 0,
+            estado: payloadLamp ? 'activo' : 'inactivo',
+            id_zona: 1,
+          } as any);
+          response.luminariaCreated = luminaria;
+        } else {
+          const updatedLuminaria = await luminaria.update({
+            estado: payloadLamp ? 'activo' : 'inactivo',
           });
-
           response.luminariaUpdated = updatedLuminaria;
         }
+
+        await EstadoLuminaria.create({
+          id_luminaria: payloadLuminariaId,
+          estado: payloadLamp ? 'activo' : 'inactivo',
+          fecha_estado: new Date(),
+        });
       }
 
       let telemetryRecord = null;
