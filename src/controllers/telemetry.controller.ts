@@ -16,7 +16,22 @@ export class TelemetryController {
       const telemetrias = await Telemetria.findAll({ order: [["fecha_registro", "DESC"]], limit: 50 });
       console.log("📦 [TELEMETRY] Registros encontrados:", telemetrias.length);
       
-      const normalizedTelemetrias = telemetrias.map((telemetria: any) => this.normalizeTelemetry(telemetria));
+      const normalizedTelemetrias = telemetrias.map((telemetria: any) => {
+        const raw = typeof telemetria.toJSON === "function" ? telemetria.toJSON() : telemetria;
+        return {
+          id: raw.id_telemetria ?? raw.id ?? null,
+          timestamp: raw.fecha_registro ?? raw.timestamp ?? null,
+          ldr: raw.ldr_value ?? raw.ldr ?? raw.ldrValue ?? null,
+          batteryVoltage: raw.battery_voltage ?? raw.batteryVoltage ?? null,
+          lamp: raw.lamp_state ?? raw.lamp ?? null,
+          autoMode: raw.auto_mode ?? raw.autoMode ?? null,
+          manualStatus: raw.manual_status ?? raw.manualStatus ?? null,
+          panelId: raw.id_panel ?? raw.panelId ?? null,
+          batteryId: raw.id_bateria ?? raw.batteryId ?? null,
+          luminariaId: raw.id_luminaria ?? raw.luminariaId ?? null,
+          energiaGenerada: raw.energia_generada ?? raw.energiaGenerada ?? null,
+        };
+      });
       console.log("✅ [TELEMETRY] Normalización completada");
 
       return res.status(200).json({
@@ -270,7 +285,24 @@ export class TelemetryController {
         response.energiaCreated = energia;
       }
 
-      response.telemetryRecord = telemetryRecord ? this.normalizeTelemetry(telemetryRecord) : null;
+      if (telemetryRecord) {
+        const raw = typeof telemetryRecord.toJSON === "function" ? telemetryRecord.toJSON() : telemetryRecord;
+        response.telemetryRecord = {
+          id: raw.id_telemetria ?? raw.id ?? null,
+          timestamp: raw.fecha_registro ?? raw.timestamp ?? null,
+          ldr: raw.ldr_value ?? raw.ldr ?? raw.ldrValue ?? null,
+          batteryVoltage: raw.battery_voltage ?? raw.batteryVoltage ?? null,
+          lamp: raw.lamp_state ?? raw.lamp ?? null,
+          autoMode: raw.auto_mode ?? raw.autoMode ?? null,
+          manualStatus: raw.manual_status ?? raw.manualStatus ?? null,
+          panelId: raw.id_panel ?? raw.panelId ?? null,
+          batteryId: raw.id_bateria ?? raw.batteryId ?? null,
+          luminariaId: raw.id_luminaria ?? raw.luminariaId ?? null,
+          energiaGenerada: raw.energia_generada ?? raw.energiaGenerada ?? null,
+        };
+      } else {
+        response.telemetryRecord = null;
+      }
 
       return res.status(201).json({ success: true, data: response });
     } catch (error) {
