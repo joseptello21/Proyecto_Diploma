@@ -6,6 +6,7 @@ export const LoginDto = z.object({
 });
 
 export const RegisterDto = z.object({
+  nombre: z.string().min(1, 'El nombre es requerido').optional(),
   email: z.string().email('Email inválido'),
   password: z
     .string()

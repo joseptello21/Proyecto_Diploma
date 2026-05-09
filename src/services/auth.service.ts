@@ -40,6 +40,7 @@ export class AuthService {
 
     // Guardar contraseña sin hash
     const newUser = await authRepository.create({
+      nombre: data.nombre ?? undefined,
       correo: data.email,
       contraseña: data.password,
     });
