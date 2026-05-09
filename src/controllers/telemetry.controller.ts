@@ -11,16 +11,39 @@ export class TelemetryController {
   public async getAll(req: Request, res: Response) {
     try {
       const telemetrias = await Telemetria.findAll({ order: [["fecha_registro", "DESC"]], limit: 50 });
+      const normalizedTelemetrias = telemetrias.map((telemetria: any) => this.normalizeTelemetry(telemetria));
 
       return res.status(200).json({
         success: true,
-        data: telemetrias,
-        telemetrias,
+        data: normalizedTelemetrias,
+        telemetrias: normalizedTelemetrias,
       });
     } catch (error) {
       console.error("Error fetching telemetry data:", error);
       return res.status(500).json({ success: false, message: "Error interno al obtener telemetría" });
     }
+  }
+
+  private normalizeTelemetry(telemetria: any) {
+    if (!telemetria) {
+      return null;
+    }
+
+    const raw = typeof telemetria.toJSON === "function" ? telemetria.toJSON() : telemetria;
+
+    return {
+      id: raw.id_telemetria ?? raw.id ?? null,
+      timestamp: raw.fecha_registro ?? raw.timestamp ?? null,
+      ldr: raw.ldr_value ?? raw.ldr ?? raw.ldrValue ?? null,
+      batteryVoltage: raw.battery_voltage ?? raw.batteryVoltage ?? null,
+      lamp: raw.lamp_state ?? raw.lamp ?? null,
+      autoMode: raw.auto_mode ?? raw.autoMode ?? null,
+      manualStatus: raw.manual_status ?? raw.manualStatus ?? null,
+      panelId: raw.id_panel ?? raw.panelId ?? null,
+      batteryId: raw.id_bateria ?? raw.batteryId ?? null,
+      luminariaId: raw.id_luminaria ?? raw.luminariaId ?? null,
+      energiaGenerada: raw.energia_generada ?? raw.energiaGenerada ?? null,
+    };
   }
 
   public async create(req: Request, res: Response) {
@@ -141,7 +164,7 @@ export class TelemetryController {
         response.energiaCreated = energia;
       }
 
-      response.telemetryRecord = telemetryRecord;
+      response.telemetryRecord = telemetryRecord ? this.normalizeTelemetry(telemetryRecord) : null;
 
       return res.status(201).json({ success: true, data: response });
     } catch (error) {
