@@ -5,6 +5,7 @@ import { sequelize, testConnection, getDatabaseInfo, renameTableIfNeeded } from 
 import { Routes } from "../routers/index";
 import { authMiddleware } from "../middleware/authMiddleware"
 import { RoleInitializer } from "../utils/roleInitializer";
+import { UserRoleInitializer } from "../utils/userRoleInitializer";
 var cors = require("cors")
 
 dotenv.config();
@@ -81,6 +82,9 @@ export class App {
 
       // Inicializar roles base
       await RoleInitializer.crearRolesBase();
+
+      // Asignar roles a usuarios existentes
+      await UserRoleInitializer.asignarRolesAUsuarios();
     } catch (error) {
       console.error("❌ Error al conectar con la base de datos:", error);
       process.exit(1); // Terminar la aplicación si no se puede conectar

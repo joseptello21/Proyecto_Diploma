@@ -41,16 +41,20 @@ export const requireRole = (rolNombre: string) => {
       });
 
       // Obtener los nombres de roles usando los id_rol
-      const idRoles = usuarioRoles.map(ur => ur.id_rol);
+      const idRoles = usuarioRoles.map(ur => ur.id_rol).filter(id => id);
       
-      const roles = await Rol.findAll({
-        where: { id_rol: idRoles, estado: "ACTIVO" }
-      });
+      let rolesDelUsuario: string[] = [];
+      
+      if (idRoles.length > 0) {
+        const roles = await Rol.findAll({
+          where: { id_rol: idRoles }
+        });
 
-      // Extraer nombres de roles
-      const rolesDelUsuario = roles
-        .map((r: any) => r.nombre_rol)
-        .filter(Boolean) as string[];
+        // Extraer nombres de roles
+        rolesDelUsuario = roles
+          .map((r: any) => r.nombre_rol)
+          .filter(Boolean) as string[];
+      }
 
       console.log(`🔐 Usuario ${userId} tiene roles:`, rolesDelUsuario);
 
@@ -105,16 +109,20 @@ export const requireAnyRole = (rolesRequeridos: string[]) => {
       });
 
       // Obtener los nombres de roles usando los id_rol
-      const idRoles = usuarioRoles.map(ur => ur.id_rol);
+      const idRoles = usuarioRoles.map(ur => ur.id_rol).filter(id => id);
       
-      const roles = await Rol.findAll({
-        where: { id_rol: idRoles, estado: "ACTIVO" }
-      });
+      let rolesDelUsuario: string[] = [];
+      
+      if (idRoles.length > 0) {
+        const roles = await Rol.findAll({
+          where: { id_rol: idRoles }
+        });
 
-      // Extraer nombres de roles
-      const rolesDelUsuario = roles
-        .map((r: any) => r.nombre_rol)
-        .filter(Boolean) as string[];
+        // Extraer nombres de roles
+        rolesDelUsuario = roles
+          .map((r: any) => r.nombre_rol)
+          .filter(Boolean) as string[];
+      }
 
       console.log(
         `🔐 Usuario ${userId} tiene roles:`,
