@@ -55,7 +55,11 @@ export class App {
     this.routers.comandoRoutes.routes(this.app)
     this.routers.zonaRoutes.routes(this.app)
 
-
+    // Nuevas rutas para roles y permisos
+    this.routers.rolRoutes.routes(this.app)
+    this.routers.recursoRoutes.routes(this.app)
+    this.routers.usuarioRolRoutes.routes(this.app)
+    this.routers.rolRecursoRoutes.routes(this.app)
   }
 
   private async dbConnection(): Promise<void> {
