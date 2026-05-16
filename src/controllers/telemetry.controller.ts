@@ -143,8 +143,32 @@ export class TelemetryController {
     };
   }
 
+  private parseTimestamp(body: any): Date {
+    const value = body.timestamp ?? body.fecha_registro ?? body.fecha ?? body.fecha_lectura ?? body.fecha_estado ?? body.createdAt;
+    if (value instanceof Date) {
+      return value;
+    }
+
+    if (typeof value === "number") {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+
+    if (typeof value === "string") {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+
+    return new Date();
+  }
+
   public async create(req: Request, res: Response) {
     try {
+      const timestamp = this.parseTimestamp(req.body);
       const {
         ldr,
         ldrValue,
@@ -189,7 +213,7 @@ export class TelemetryController {
 
       const sensorData = await Datos.create({
         nivel_luz: payloadLdr,
-        fecha: new Date(),
+        fecha: timestamp,
         estado_luz: payloadLamp ? "activo" : "inactivo",
       });
 
@@ -260,7 +284,7 @@ export class TelemetryController {
         await EstadoBateria.create({
           id_bateria: payloadBatteryId,
           nivel_carga: payloadBatteryVoltage ?? 0,
-          fecha_estado: new Date(),
+          fecha_estado: timestamp,
         });
       }
 
@@ -285,7 +309,7 @@ export class TelemetryController {
         await EstadoLuminaria.create({
           id_luminaria: payloadLuminariaId,
           estado: payloadLamp ? 'activo' : 'inactivo',
-          fecha_estado: new Date(),
+          fecha_estado: timestamp,
         });
       }
 
@@ -303,7 +327,7 @@ export class TelemetryController {
           id_bateria: payloadBatteryId,
           id_luminaria: payloadLuminariaId,
           energia_generada: payloadEnergiaGenerada,
-          fecha_registro: new Date(),
+          fecha_registro: timestamp,
         });
       }
 
@@ -311,7 +335,7 @@ export class TelemetryController {
         const energia = await TelemetriaEnergia.create({
           id_panel: payloadPanelId,
           energia_generada: payloadEnergiaGenerada,
-          fecha_registro: new Date(),
+          fecha_registro: timestamp,
         });
         response.energiaCreated = energia;
       }
