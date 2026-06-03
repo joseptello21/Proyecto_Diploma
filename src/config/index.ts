@@ -81,7 +81,7 @@ export class App {
       await renameTableIfNeeded();
 
       // Sincronizar la base de datos
-      await sequelize.sync({ force: false });
+      await sequelize.sync({ alter: true });
       console.log(`📦 Base de datos sincronizada exitosamente`);
 
       // Inicializar roles base

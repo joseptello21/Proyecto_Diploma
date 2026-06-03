@@ -32,14 +32,14 @@ export class RolController {
 
   public async create(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre_rol } = req.body;
+      const { nombre_rol, descripcion, estado } = req.body;
 
       if (!nombre_rol) {
         res.status(400).json({ message: "El nombre del rol es requerido" });
         return;
       }
 
-      const rol = await Rol.create({ nombre_rol });
+      const rol = await Rol.create({ nombre_rol, descripcion, estado });
       res.status(201).json(rol);
     } catch (error) {
       console.error("Error al crear rol:", error);
@@ -50,7 +50,7 @@ export class RolController {
   public async update(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(String(req.params.id));
-      const { nombre_rol } = req.body;
+      const { nombre_rol, descripcion, estado } = req.body;
 
       const rol = await Rol.findByPk(id);
 
@@ -59,7 +59,7 @@ export class RolController {
         return;
       }
 
-      await rol.update({ nombre_rol });
+      await rol.update({ nombre_rol, descripcion, estado });
       res.json(rol);
     } catch (error) {
       console.error("Error al actualizar rol:", error);
