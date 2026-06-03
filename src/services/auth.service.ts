@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { authRepository } from '../repositories/auth.repository';
-import { UnauthorizedError, ConflictError } from '../utils/error.handler';
+import { UnauthorizedError, ConflictError, InternalServerError } from '../utils/error.handler';
 import { LoginInput, RegisterInput, AuthPayload } from '../dtos/auth.dto';
 
 export class AuthService {
@@ -53,18 +53,26 @@ export class AuthService {
 
   async validateToken(token: string): Promise<AuthPayload> {
     try {
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET!
-      ) as AuthPayload;
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        throw new InternalServerError('JWT_SECRET no está configurado');
+      }
+      const decoded = jwt.verify(token, secret) as AuthPayload;
       return decoded;
-    } catch {
+    } catch (error) {
+      if (error instanceof InternalServerError) {
+        throw error;
+      }
       throw new UnauthorizedError('Token inválido');
     }
   }
 
   private generateToken(payload: AuthPayload): string {
-    return jwt.sign(payload, process.env.JWT_SECRET!, {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new InternalServerError('JWT_SECRET no está configurado');
+    }
+    return jwt.sign(payload, secret, {
       expiresIn: '8h',
     });
   }

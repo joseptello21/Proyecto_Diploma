@@ -33,6 +33,12 @@ export class ConflictError extends AppError {
   }
 }
 
+export class InternalServerError extends AppError {
+  constructor(message = 'Error interno del servidor') {
+    super(500, message);
+  }
+}
+
 export const errorHandler = (err: unknown, res: any) => {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
